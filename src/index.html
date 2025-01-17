@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live coding platform</title>
+    <style>
+        #editor {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ccc;
+        }
+        #output {
+            width: 100%;
+            height: 150px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            padding: 10px;
+            white-space: pre-wrap;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.19.0/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.19.0/ext-language_tools.js"></script>
+</head>
+<body>
+<h1>Livecoding platform</h1>
+<div id="editor">import java.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+</div>
+<button id="runCode">Run Code</button>
+<h2>Output:</h2>
+<div id="output"></div>
+
+<script>
+    // Инициализация Ace Editor
+    const editor = ace.edit("editor", {
+        mode: "ace/mode/java",
+        theme: "ace/theme/monokai",
+        enableBasicAutocompletion: true,
+        enableLiveAutocompletion: true,
+        enableSnippets: true
+    });
+
+    // URL бэкэнда
+    const backendUrl = 'http://localhost:8080/api/execute';
+
+    // Кнопка для выполнения кода
+    document.getElementById("runCode").addEventListener("click", async () => {
+        const code = editor.getValue(); // Получение кода из редактора
+        try {
+            // Отправка кода на сервер
+            const response = await fetch(backendUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+                body: code,
+            });
+
+            if (response.ok) {
+                const result = await response.text();
+                document.getElementById("output").innerText = result; // Отображение результата выполнения
+            } else {
+                document.getElementById("output").innerText =
+                    `Error: ${response.status} ${response.statusText}`;
+            }
+        } catch (error) {
+            // Обработка ошибок сети
+            document.getElementById("output").innerText = `Error: ${error.message}`;
+        }
+    });
+</script>
+</body>
+</html>
