@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: "3425149/livecoding-ui:latest"
+    ports:
+      - "8080:80"
+    networks:
+      - app-network
+
+  backend:
+    image: "3425149/livecoding-api:latest"
+    environment:
+        FRONTEND_URL: "http://frontend:80"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
